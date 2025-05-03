@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db/:/var/lib/postgresql/data
+    restart: always
+    env_file: ./.env
+    networks:
+      - postgresnet
+  web:
+    image: "report_task:dev"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - ENVIRONMENT=development
+        - SAFETY_API_KEY=${SAFETY_API_KEY}
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+    env_file: ./.env
+    networks:
+      - postgresnet
+    command: sh start-development.sh
+
+networks:
+  postgresnet:
