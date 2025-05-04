@@ -40,15 +40,13 @@ class DeliverySerializer(serializers.ModelSerializer):
         read_only=True,
         format=DATETIME_FORMAT
     )
-    file = FileSerializer(
-        many=True,
-        read_only=True
-    )
     transport = serializers.StringRelatedField()
     services = serializers.StringRelatedField(
         many=True,
     )
     packaging = serializers.StringRelatedField()
+    file = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Delivery
         fields = '__all__'

@@ -24,7 +24,7 @@ class DeliveryAdmin(admin.ModelAdmin):
     services_list.short_description = 'Услуги'
 
     def file_list(self, obj):
-        return ", ".join([f.name for f in obj.file.all()])
+        return ", ".join([f.file.name for f in obj.file.all()])
     file_list.short_description = 'Файлы'
 
 
