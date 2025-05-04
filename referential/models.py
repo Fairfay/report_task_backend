@@ -151,6 +151,16 @@ class Delivery(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+    comment = models.CharField(
+        'Комментарий',
+        max_length=5000,
+        blank=True
+    )
+    fio = models.CharField(
+        'ФИО',
+        max_length=255,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Доставка'

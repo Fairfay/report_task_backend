@@ -1,21 +1,34 @@
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.db.models import Count
+from rest_framework.pagination import PageNumberPagination
 from django.db.models.functions import ExtractYear, ExtractDay, ExtractMonth
 
-from referential.models import Delivery, Transport, File, Service
+from referential.models import Delivery, Transport, File, Service, Status, Packaging
 from referential.serializers import (
     DeliverySerializer, TransportSerializer,
-    FileSerializer, ServiceSerializer
+    FileSerializer, ServiceSerializer, 
+    StatusSerializer, PackagingSerializer
 )
 
 
 class DeliveryViewSet(viewsets.ModelViewSet):
-    queryset = Delivery.objects.all()
+    queryset = Delivery.objects.select_related(
+        'transport',
+        'operator',
+        'packaging',
+    ).prefetch_related(
+        'file',
+        'services',
+    ).all()
     serializer_class = DeliverySerializer
+    permission_classes = [
+        AllowAny,
+    ]
+    pagination_class = PageNumberPagination 
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -37,6 +50,10 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         serializer = DeliverySerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
     
+    def perform_create(self, serializer):
+        print("@"*100)
+        print(self.request.user)
+        serializer.save(operator=self.request.user.id)
 
 class StatisticsViewSet(viewsets.ModelViewSet):
     """
@@ -98,6 +115,22 @@ class TransportViewSet(viewsets.ReadOnlyModelViewSet):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+
+class StatusViewSet(viewsets.ModelViewSet):
+    queryset = Status.objects.all()
+    serializer_class = StatusSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+
+class PackagingViewSet(viewsets.ModelViewSet):
+    queryset = Packaging.objects.all()
+    serializer_class = PackagingSerializer
     permission_classes = [
         IsAuthenticated,
     ]

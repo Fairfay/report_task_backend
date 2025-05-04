@@ -8,13 +8,16 @@ from rest_framework.routers import DefaultRouter
 from referential.views import (
     DeliveryViewSet, TransportViewSet,
     FileViewSet, FileUploadAPIView,
-    ServiceViewSet, StatisticsViewSet
+    ServiceViewSet, StatisticsViewSet,
+    StatusViewSet, PackagingViewSet
 )
 
 
 router = DefaultRouter()
 router.register(r'transports', TransportViewSet, basename='transports')
 router.register(r'services', ServiceViewSet, basename='services')
+router.register(r'statuses', StatusViewSet, basename='statuses')
+router.register(r'packagings', PackagingViewSet, basename='packagings')
 router.register(r'deliverys', DeliveryViewSet, basename='deliverys')
 router.register(r'files', FileViewSet, basename='files')
 router.register(r'statistics', StatisticsViewSet, basename='statistics')

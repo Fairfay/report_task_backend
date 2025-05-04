@@ -48,7 +48,7 @@ class DeliverySerializer(serializers.ModelSerializer):
     services = serializers.StringRelatedField(
         many=True,
     )
-
+    packaging = serializers.StringRelatedField()
     class Meta:
         model = Delivery
         fields = '__all__'
