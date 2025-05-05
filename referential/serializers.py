@@ -6,6 +6,7 @@ from referential.models import (
     Packaging, Service,
     Status, File,
 )
+from identity.models import User
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
         fields = '__all__'
-        read_only_fields = ('created_at')
+        read_only_fields = ('created_at', 'id')
 
 
 class TransportSerializer(serializers.ModelSerializer):
@@ -40,12 +41,11 @@ class DeliverySerializer(serializers.ModelSerializer):
         read_only=True,
         format=DATETIME_FORMAT
     )
-    transport = serializers.StringRelatedField()
-    services = serializers.StringRelatedField(
-        many=True,
-    )
-    packaging = serializers.StringRelatedField()
-    file = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    transport = serializers.PrimaryKeyRelatedField(queryset=Transport.objects.all())
+    services = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
+    packaging = serializers.PrimaryKeyRelatedField(queryset=Packaging.objects.all())
+    file = serializers.PrimaryKeyRelatedField(queryset=File.objects.all(), many=True)
+    operator = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
 
     class Meta:
         model = Delivery

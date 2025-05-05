@@ -51,16 +51,21 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
     
     def perform_create(self, serializer):
-        print("@"*100)
-        print(self.request.user)
-        serializer.save(operator=self.request.user.id)
+        serializer.save(operator=self.request.user)
 
 class StatisticsViewSet(viewsets.ModelViewSet):
     """
     Используется для вывода статистических данных
     """
     pagination_class = None
-    queryset = Delivery.objects.all()
+    queryset = Delivery.objects.select_related(
+        'transport',
+        'operator',
+        'packaging',
+    ).prefetch_related(
+        'file',
+        'services',
+    ).all()
     permission_classes = [
         IsAuthenticated,
     ]
@@ -161,8 +166,8 @@ class FileViewSet(viewsets.ModelViewSet):
     '''
     Используется для вывода и удаления файлов - модель 'File'.
     '''
-    http_method_names = ['delete']
-    queryset = File.objects.select_related('organization').all()
+    http_method_names = ['get', 'delete']
+    queryset = File.objects.all()
     serializer_class = FileSerializer
     permission_classes = [
         IsAuthenticated,
