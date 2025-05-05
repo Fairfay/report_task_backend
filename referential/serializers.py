@@ -17,12 +17,14 @@ class FileSerializer(serializers.ModelSerializer):
 
     created_at = serializers.DateTimeField(
         read_only=True,
+        # Используется глобальный формат даты из настроек
         format=DATETIME_FORMAT
     )
 
     class Meta:
         model = File
         fields = '__all__'
+        # Эти поля нельзя изменять через API
         read_only_fields = ('created_at', 'id')
 
 
@@ -41,6 +43,7 @@ class DeliverySerializer(serializers.ModelSerializer):
         read_only=True,
         format=DATETIME_FORMAT
     )
+    # Явное указание связей с первичными ключами для гибкости API
     transport = serializers.PrimaryKeyRelatedField(queryset=Transport.objects.all())
     services = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
     packaging = serializers.PrimaryKeyRelatedField(queryset=Packaging.objects.all())

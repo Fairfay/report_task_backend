@@ -2,7 +2,6 @@ import os
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
 
-# Create your models here.
 
 User = get_user_model()
 
@@ -20,6 +19,7 @@ class Transport(models.Model):
         verbose_name_plural = 'Транспорты'
 
     def __str__(self):
+        # Обрезаем для компактного отображения в админке
         return self.brand[:50]
 
 
@@ -82,6 +82,7 @@ class File(models.Model):
         verbose_name='Файл'
     )
     created_at = models.DateTimeField(
+        # Автоматически устанавливается при создании
         auto_now_add=True
     )
 
@@ -166,8 +167,8 @@ class Delivery(models.Model):
         verbose_name = 'Доставка'
         verbose_name_plural = 'Доставки'
         indexes = [
-            models.Index(fields=['status']),
-            models.Index(fields=['operator_id']),
+            models.Index(fields=['status']),# Для фильтрации по статусу
+            models.Index(fields=['operator_id']), # Для поиска по оператору
         ]
 
     def __str__(self):

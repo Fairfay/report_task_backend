@@ -16,6 +16,11 @@ from referential.serializers import (
 
 
 class DeliveryViewSet(viewsets.ModelViewSet):
+    '''Основной CRUD для доставок'''
+
+    # Оптимизация запросов:
+    # - select_related для ForeignKey
+    # - prefetch_related для ManyToMany
     queryset = Delivery.objects.select_related(
         'transport',
         'operator',
@@ -26,7 +31,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     ).all()
     serializer_class = DeliverySerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     pagination_class = PageNumberPagination 
 
@@ -37,6 +42,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         date_from = self.request.query_params.get('date_from')
         date_to = self.request.query_params.get('date_to')
 
+        # Фильтрация по параметрам запроса
         if transport_id:
             queryset = queryset.filter(transport=transport_id)
         if service_id:
@@ -46,16 +52,19 @@ class DeliveryViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(delivery_time__gte=date_from, delivery_time__lte=date_to)
             else:
                 queryset = queryset.filter(delivery_time__date=date_from)
+        # Пагинация
         page = self.paginate_queryset(queryset)
         serializer = DeliverySerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
     
     def perform_create(self, serializer):
+        '''Автоматическое проставление оператора при создании'''
         serializer.save(operator=self.request.user)
 
 class StatisticsViewSet(viewsets.ModelViewSet):
     """
-    Используется для вывода статистических данных
+    Генерация статистики по доставкам
+    Пример ответа: [{"year": 2023, "month": 9, "day": 15, "count": 25}]
     """
     pagination_class = None
     queryset = Delivery.objects.select_related(
@@ -71,6 +80,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
     ]
 
     def list(self, request):
+        '''Статистика по дням с фильтрацией'''
         queryset = self.get_queryset()
         transport_id = self.request.query_params.get('transport')
         service_id = self.request.query_params.get('service')
@@ -86,7 +96,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(delivery_time__gte=date_from, delivery_time__lte=date_to)
             else:
                 queryset = queryset.filter(delivery_time__date=date_from)
-
+        # Группировка по дате и подсчет
         stats = (
             queryset
             .annotate(year=ExtractYear('delivery_time'))
@@ -110,6 +120,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
 
 class TransportViewSet(viewsets.ReadOnlyModelViewSet):
+    '''Предоставляет список транспорта'''
     queryset = Transport.objects.all()
     serializer_class = TransportSerializer
     permission_classes = [
@@ -118,6 +129,7 @@ class TransportViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
+    '''CRUD для дополнительных услуг'''
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     permission_classes = [
@@ -126,6 +138,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
 class StatusViewSet(viewsets.ModelViewSet):
+    '''CRUD для статусов доставки'''
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
     permission_classes = [
@@ -134,6 +147,7 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 
 class PackagingViewSet(viewsets.ModelViewSet):
+    '''CRUD для типов упаковки'''
     queryset = Packaging.objects.all()
     serializer_class = PackagingSerializer
     permission_classes = [
@@ -142,6 +156,7 @@ class PackagingViewSet(viewsets.ModelViewSet):
 
 
 class FileUploadAPIView(APIView):
+    '''Загрузка файлов (одного или нескольких)'''
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
     permission_classes = [
@@ -149,6 +164,7 @@ class FileUploadAPIView(APIView):
     ]
 
     def post(self, request, *args, **kwargs):
+        '''Обработка множественной загрузки файлов'''
         files = request.FILES.getlist('file')
         response_data = []
 
@@ -174,6 +190,7 @@ class FileViewSet(viewsets.ModelViewSet):
     ]
 
     def destroy(self, request, *args, **kwargs):
+        '''Удаление файла'''
         instance = self.get_object()
         self.perform_destroy(instance)
 

@@ -13,6 +13,7 @@ from referential.views import (
 )
 
 
+# Инициализация DRF-роутера для автоматической генерации URL по ViewSets
 router = DefaultRouter()
 router.register(r'transports', TransportViewSet, basename='transports')
 router.register(r'services', ServiceViewSet, basename='services')
@@ -23,11 +24,13 @@ router.register(r'files', FileViewSet, basename='files')
 router.register(r'statistics', StatisticsViewSet, basename='statistics')
 
 urlpatterns = [
+    # API маршруты
     path('api/identity/', include('identity.urls')),
     path('api/v1/', include(router.urls)),
     path('api/admin/', admin.site.urls),
     path('api/upload-file/', FileUploadAPIView.as_view(), name='upload-file'),
 ]
+# Добавление отладочных инструментов и медиафайлов в режиме DEBUG
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [path('__debug__/', include(debug_toolbar.urls)),]

@@ -5,10 +5,16 @@ from django.utils.translation import gettext_lazy as _
 from identity.models import User
 
 
+# Кастомная админка для модели User
+# Расширяет стандартный UserAdmin для поддержки дополнительных полей и кастомного поиска
 class UserAdmin(BaseUserAdmin):
+    # Поле ID доступно только для чтения (неизменяемое)
     readonly_fields = ('id',)
+    # Отображаемые поля в списке пользователей
     list_display = ('id', 'username', 'email', 'last_name')
+    # Поля для поиска через стандартную панель поиска
     search_fields = ('username', 'last_name', 'email')
+    # Группировка полей при редактировании пользователя
     fieldsets = (
         (None, {'fields': ('id', 'username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'patronymic')}),
@@ -17,6 +23,7 @@ class UserAdmin(BaseUserAdmin):
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')})
     )
+    # Группировка полей при создании пользователя
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -28,6 +35,7 @@ class UserAdmin(BaseUserAdmin):
         })
     )
 
+    # Расширенный поиск с поддержкой префиксов (user:/last_name:/email:/id:)
     def get_search_results(self, request, queryset, search_term):
         if search_term:
             if search_term.startswith('user:'):
@@ -44,8 +52,9 @@ class UserAdmin(BaseUserAdmin):
                 queryset = queryset.filter(id__icontains=search_term)
             else:
                 queryset = super().get_search_results(request, queryset, search_term)[0]
-
+        # Возвращаем отфильтрованный queryset и его количество
         return queryset, queryset.count()
 
 
+# Регистрация кастомной админки для модели User
 admin.site.register(User, UserAdmin)

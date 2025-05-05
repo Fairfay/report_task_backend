@@ -6,6 +6,7 @@ from referential.models import (
     Packaging, Transport
 )
 
+#Аналогично с identity/admin
 class DeliveryAdmin(admin.ModelAdmin):
     search_fields = ['id']
     readonly_fields = ('id', 'created_at', 'updated_at')
