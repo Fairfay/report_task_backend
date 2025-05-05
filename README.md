@@ -16,3 +16,5 @@ docker-compose up --build
 ```bash
 docker-compose -f docker-compose.prod.yml up --build
 ```
+
+Дополнительные команды можно посмотреть в Makefile
