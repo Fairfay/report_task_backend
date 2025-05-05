@@ -26,7 +26,7 @@
 
 Запустить проект
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 # Для запуска проекта в прод
 
@@ -34,7 +34,7 @@ docker-compose up --build
 
 Запустить проект
 ```bash
-docker-compose -f docker-compose.prod.yml up --build
+docker compose -f docker-compose.prod.yml up --build
 ```
 
 Админка находится по адресу domen/api/admin/
