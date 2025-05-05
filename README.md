@@ -36,6 +36,11 @@ docker compose up --build
 ```bash
 docker compose -f docker-compose.prod.yml up --build
 ```
+Создание суперпользователя
+```bash
+docker exec -it <container_name> bash
+python manage.py createsuperuser
+```
 
 Админка находится по адресу domen/api/admin/
 
