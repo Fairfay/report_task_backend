@@ -13,6 +13,7 @@
 - [x] Настроен Makefile
 - [x] Настроен Gunicorn
 - [x] Настроены CORS
+- [x] Подключена БД Postgres
 - [x] Установлен Poetry
 - [x] Настроен скрипт запуска
 - [x] Настроена django Admin
