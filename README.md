@@ -40,6 +40,14 @@ docker compose -f docker-compose.prod.yml up --build
 docker exec -it <container_name> bash
 python manage.py createsuperuser
 ```
+Получить telegram_id можно в 
+```bash
+@userinfobot
+```
+Получить токен бота можно в
+```bash
+@BotFather
+```
 
 Админка находится по адресу domen/api/admin/
 
